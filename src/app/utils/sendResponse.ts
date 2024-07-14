@@ -10,6 +10,7 @@ type responsedata = {
 const sendResponse = (res: Response, data: responsedata) => {
   res.status(data.statusCode).json({
     success: data.success,
+    statusCode: data.statusCode,
     message: data.message,
     data: data.data,
   })

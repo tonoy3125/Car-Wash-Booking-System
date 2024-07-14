@@ -1,9 +1,11 @@
 import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import { routes } from './app/routes'
+
 import globalErrorHandler from './app/middlewares/globalErrorHandler'
 import notFound from './app/errors/notFound'
+import { routes } from './app/routes'
+
 const app: Application = express()
 // const port = 3000
 
@@ -13,7 +15,7 @@ app.use(cookieParser())
 app.use(cors({ origin: ['http://localhost:5173'] }))
 
 // Application Routes
-app.use('/api/v1', routes)
+app.use('/api', routes)
 
 const getAController = (req: Request, res: Response) => {
   const a = 10
