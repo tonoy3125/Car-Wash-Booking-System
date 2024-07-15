@@ -11,7 +11,13 @@ const getSingleServiceFromDB = async (id: string) => {
   return result
 }
 
+const getAllServiceFromDB = async () => {
+  const result = await Service.find()
+  return result
+}
+
 export const ServiceServices = {
   createServiceIntoDB,
   getSingleServiceFromDB,
+  getAllServiceFromDB,
 }
