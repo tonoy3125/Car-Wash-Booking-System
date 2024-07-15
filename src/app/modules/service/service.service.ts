@@ -16,6 +16,7 @@ const getAllServiceFromDB = async () => {
   return result
 }
 
+
 export const ServiceServices = {
   createServiceIntoDB,
   getSingleServiceFromDB,
