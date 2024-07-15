@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose'
+import bcrypt from 'bcrypt'
 import { TUser, UserModel } from './user.interface'
 
 const userSchema = new Schema<TUser>(
@@ -38,6 +39,13 @@ const userSchema = new Schema<TUser>(
 // User Statics Method isExistsByEmail
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await User.findOne({ email }).select('+password')
+}
+
+userSchema.statics.isPasswordMatch = async function (
+  plainTextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword)
 }
 
 export const User = model<TUser, UserModel>('User', userSchema)
