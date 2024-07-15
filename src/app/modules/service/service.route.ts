@@ -17,4 +17,11 @@ router.post(
 router.get('/:id', ServiceControllers.getSingleService)
 router.get('/', ServiceControllers.getAllService)
 
+router.patch(
+  '/:id',
+  auth(USER_ROLE.admin),
+  validateRequest(ServiceValidations.updateServiceValidationSchema),
+  ServiceControllers.updateService,
+)
+
 export const ServiceRoutes = router

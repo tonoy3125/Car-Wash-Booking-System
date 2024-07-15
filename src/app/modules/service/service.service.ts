@@ -1,3 +1,5 @@
+import httpStatus from 'http-status'
+import { AppError } from '../../errors/AppError'
 import { TService } from './service.interface'
 import { Service } from './service.model'
 
@@ -16,9 +18,20 @@ const getAllServiceFromDB = async () => {
   return result
 }
 
+const updateServiceIntoDB = async (id: string, payload: Partial<TService>) => {
+  const service = await Service.findById(id)
+
+  if (!service) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Service Not Found by this id')
+  }
+
+  const result = await Service.findByIdAndUpdate(id, payload, { new: true })
+  return result
+}
 
 export const ServiceServices = {
   createServiceIntoDB,
   getSingleServiceFromDB,
   getAllServiceFromDB,
+  updateServiceIntoDB,
 }
