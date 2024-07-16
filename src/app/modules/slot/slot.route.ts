@@ -14,4 +14,9 @@ router.post(
   SlotControllers.createSlot,
 )
 
+const router2 = express.Router()
+
+router2.get('/', SlotControllers.getAvailableSlots)
+
 export const SlotRoutes = router
+export const SlotRoutes2 = router2
