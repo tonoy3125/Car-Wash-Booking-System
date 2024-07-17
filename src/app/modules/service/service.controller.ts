@@ -20,7 +20,7 @@ const getSingleService = catchAsync(async (req, res) => {
     success: result ? true : false,
     statusCode: result ? httpStatus.OK : httpStatus.NOT_FOUND,
     message: result ? 'Service retrieved successfully' : 'No Data Found',
-    data: result,
+    data: result ? result : [],
   })
 })
 

@@ -3,8 +3,9 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
 import globalErrorHandler from './app/middlewares/globalErrorHandler'
-import notFound from './app/errors/notFound'
+
 import { routes } from './app/routes'
+import NotFound from './app/errors/notFound'
 
 const app: Application = express()
 // const port = 3000
@@ -28,6 +29,6 @@ app.get('/', getAController)
 app.use(globalErrorHandler)
 
 // Not found
-app.use(notFound)
+app.use(NotFound)
 
 export default app

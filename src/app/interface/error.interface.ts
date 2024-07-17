@@ -1,10 +1,10 @@
-export type TErrorSources = {
+export type TErrorMessages = {
   path: string | number
   message: string
 }[]
 
-export type TGenericErrorResponse = {
+export type TErrorResponse = {
   statusCode: number
   message: string
-  errorSources: TErrorSources
+  errorMessages: TErrorMessages
 }

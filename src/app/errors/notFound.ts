@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from 'express'
-import httpStatus from 'http-status'
+import { Request, Response } from 'express';
 
-const notFound = (req: Request, res: Response, next: NextFunction) => {
-  return res.status(httpStatus.NOT_FOUND).json({
-    success: false,
+const NotFound = (req: Request, res: Response) => {
+  res.status(404).json({
+    success: true,
+    statusCode: 404,
     message: 'Not Found',
-    err: '',
-  })
-}
+  });
+};
 
-export default notFound
+export default NotFound;
