@@ -32,5 +32,9 @@ const slotSchema = new Schema<TSlot>(
   },
 )
 
+slotSchema.pre('find', function (next) {
+  this.find({ isBooked: { $ne: 'booked' } })
+  next()
+})
 
 export const Slot = model<TSlot>('Slot', slotSchema)
