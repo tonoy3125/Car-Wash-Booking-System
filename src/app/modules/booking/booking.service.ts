@@ -51,6 +51,15 @@ const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
   return result
 }
 
+const getAllBookingsFromDB = async () => {
+  const result = await Booking.find()
+    .populate('customer')
+    .populate('service')
+    .populate('slot')
+  return result
+}
+
 export const BookingServices = {
   createBookingInDB,
+  getAllBookingsFromDB,
 }
