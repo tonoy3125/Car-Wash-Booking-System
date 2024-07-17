@@ -13,17 +13,16 @@ const app: Application = express()
 // parser
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors({ origin: ['http://localhost:5173'] }))
+app.use(cors())
 
 // Application Routes
 app.use('/api', routes)
 
-const getAController = (req: Request, res: Response) => {
-  const a = 10
-  res.send(a)
-}
-
-app.get('/', getAController)
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Wellcome to Car Wash Backend',
+  })
+})
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.use(globalErrorHandler)
