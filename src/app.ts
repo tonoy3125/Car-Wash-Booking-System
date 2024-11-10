@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
@@ -13,7 +13,15 @@ const app: Application = express()
 // parser
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      // 'https://power-pulse-fitness-equipment-and-accessories-frontend.vercel.app',
+    ],
+    credentials: true,
+  }),
+)
 
 // Application Routes
 app.use('/api', routes)

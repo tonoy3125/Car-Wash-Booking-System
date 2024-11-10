@@ -3,8 +3,8 @@ import { AppError } from '../../errors/AppError'
 import { TUser } from '../user/user.interface'
 import { User } from '../user/user.model'
 import { TLoginUser } from './auth.interface'
-import jwt from 'jsonwebtoken'
 import config from '../../config'
+import createToken from './auth.utils'
 
 const signUp = async (payload: TUser) => {
   const result = await User.create(payload)
@@ -37,12 +37,22 @@ const login = async (payload: TLoginUser) => {
     role: user?.role,
   }
 
-  const token = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: config.jwt_access_expires_in,
-  })
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  )
+
+  // Refresh Token
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  )
 
   return {
-    token,
+    accessToken,
+    refreshToken,
     user,
   }
 }

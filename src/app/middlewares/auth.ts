@@ -20,16 +20,18 @@ const auth = (...requiredRoles: TUserRoles[]) => {
       ) as JwtPayload
       const { email, role } = decoded
 
-      const user = User.findOne({ email, role })
+      const user = await User.findOne({ email, role })
 
       if (!user) {
         throw new Error()
       }
+      // console.log(user)
 
       if (!requiredRoles.includes(role)) {
         throw new Error()
       }
       req.user = {
+        _id: user._id,
         email,
         role,
       }
