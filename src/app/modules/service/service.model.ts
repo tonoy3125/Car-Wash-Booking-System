@@ -7,6 +7,14 @@ const serviceSchema = new Schema<TService>(
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+      required: true,
+    },
+    icon: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       required: true,

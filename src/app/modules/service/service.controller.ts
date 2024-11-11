@@ -4,7 +4,8 @@ import sendResponse from '../../utils/sendResponse'
 import { ServiceServices } from './service.service'
 
 const createService = catchAsync(async (req, res) => {
-  const result = await ServiceServices.createServiceIntoDB(req?.body)
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] }
+  const result = await ServiceServices.createServiceIntoDB(files, req?.body)
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

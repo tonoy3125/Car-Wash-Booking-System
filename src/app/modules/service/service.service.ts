@@ -3,7 +3,16 @@ import { AppError } from '../../errors/AppError'
 import { TService } from './service.interface'
 import { Service } from './service.model'
 
-const createServiceIntoDB = async (payload: TService) => {
+const createServiceIntoDB = async (
+  files: { [fieldname: string]: Express.Multer.File[] },
+  payload: TService,
+) => {
+  if (files.image && files.image[0]) {
+    payload.image = files.image[0].path // Assign the image URL
+  }
+  if (files.icon && files.icon[0]) {
+    payload.icon = files.icon[0].path // Assign the icon URL
+  }
   const result = await Service.create(payload)
   return result
 }
