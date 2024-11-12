@@ -14,13 +14,27 @@ router.post(
   upload, // Multer middleware for single image upload
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Parse the form-data body sent as JSON
+      // Check if req.body.data exists and is a JSON string
       if (req.body?.data) {
+        // console.log('Raw req.body.data:', req.body.data)
+
+        // Attempt to parse the JSON data
         req.body = JSON.parse(req.body.data)
       }
       next()
     } catch (error) {
-      next(error)
+      console.error('JSON parsing error:', error)
+      return res.status(400).json({
+        success: false,
+        message:
+          'Invalid JSON format in data. Please ensure JSON is correctly formatted.',
+        errorMessages: [
+          {
+            path: '',
+            message: 'Invalid JSON format in data',
+          },
+        ],
+      })
     }
   },
   validateRequest(ServiceValidations.createServiceValidationSchema),
