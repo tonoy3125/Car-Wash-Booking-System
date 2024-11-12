@@ -1,17 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response } from 'express'
-type responsedata = {
-  statusCode: number
-  success: boolean
-  message: string
-  data: any
+
+type TMeta = {
+  limit: number
+  page: number
+  total: number
+  totalPage: number
 }
 
-const sendResponse = (res: Response, data: responsedata) => {
-  res.status(data.statusCode).json({
+type TResponse<T> = {
+  statusCode: number
+  success: boolean
+  message?: string
+  meta?: TMeta
+  data: T
+}
+
+const sendResponse = <T>(res: Response, data: TResponse<T>) => {
+  res.status(data?.statusCode).json({
     success: data.success,
-    statusCode: data.statusCode,
     message: data.message,
+    meta: data.meta,
     data: data.data,
   })
 }

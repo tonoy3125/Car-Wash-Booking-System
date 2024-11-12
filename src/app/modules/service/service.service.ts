@@ -2,6 +2,8 @@ import httpStatus from 'http-status'
 import { AppError } from '../../errors/AppError'
 import { TService } from './service.interface'
 import { Service } from './service.model'
+import QueryBuilder from '../../builder/QueryBuilder'
+import { serviceSearchableField } from './service.constant'
 
 const createServiceIntoDB = async (
   files: { [fieldname: string]: Express.Multer.File[] },
@@ -22,9 +24,24 @@ const getSingleServiceFromDB = async (id: string) => {
   return result
 }
 
-const getAllServiceFromDB = async () => {
-  const result = await Service.find()
-  return result
+const getAllServiceFromDB = async (query: Record<string, unknown>) => {
+  const serviceQuery = new QueryBuilder(Service.find(), query)
+    .search(serviceSearchableField)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+
+  // const result = await Service.find()
+  // return result
+
+  const meta = await serviceQuery.countTotal()
+  const result = await serviceQuery.modelQuery
+
+  return {
+    meta,
+    result,
+  }
 }
 
 const updateServiceIntoDB = async (id: string, payload: Partial<TService>) => {
