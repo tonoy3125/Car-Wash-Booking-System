@@ -47,6 +47,24 @@ router.get('/', ServiceControllers.getAllService)
 router.put(
   '/:id',
   auth(USER_ROLE.admin),
+  upload,
+  (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.body?.data) {
+        console.log('Raw req.body.data:', req.body.data) // Debug
+        req.body = JSON.parse(req.body.data)
+      }
+      console.log('Parsed req.body:', req.body) // Debug
+      next()
+    } catch (error) {
+      console.error('JSON parsing error:', error)
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid JSON format in data.',
+        errorMessages: [{ path: '', message: 'Invalid JSON format in data.' }],
+      })
+    }
+  },
   validateRequest(ServiceValidations.updateServiceValidationSchema),
   ServiceControllers.updateService,
 )

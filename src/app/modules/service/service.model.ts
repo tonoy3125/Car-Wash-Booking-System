@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose'
 import { TService } from './service.interface'
+import { TDurationUnitTypes } from './service.constant'
 
 const serviceSchema = new Schema<TService>(
   {
@@ -24,8 +25,13 @@ const serviceSchema = new Schema<TService>(
       required: true,
     },
     duration: {
+      type: Number,
+      required: true,
+    },
+    durationUnit: {
       type: String,
       required: true,
+      enum: TDurationUnitTypes,
     },
     isDeleted: {
       type: Boolean,

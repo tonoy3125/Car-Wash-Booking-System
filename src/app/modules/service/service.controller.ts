@@ -38,7 +38,15 @@ const getAllService = catchAsync(async (req, res) => {
 
 const updateService = catchAsync(async (req, res) => {
   const { id } = req.params
-  const result = await ServiceServices.updateServiceIntoDB(id, req.body)
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] }
+  const payload = req.body // Use the request body as the update payload
+
+  console.log('Files:', files)
+  console.log('Payload:', payload)
+
+  // Pass the payload and files to the service for update
+  const result = await ServiceServices.updateServiceIntoDB(id, payload, files)
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
