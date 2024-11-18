@@ -26,18 +26,34 @@ const createSlotIntoDB = async (payload: TSlot) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid service duration unit')
   }
 
+  // Helper function to convert 12-hour time format with AM/PM to minutes from midnight
+  const convertTimeToMinutes = (time: string): number => {
+    const [hourMinute, period] = time.split(' ') // Split time and AM/PM
+    const [hours, minutes] = hourMinute.split(':').map(Number)
+    const isPM = period.toUpperCase() === 'PM'
+    const hourIn24 = (hours % 12) + (isPM ? 12 : 0) // Convert to 24-hour format
+    return hourIn24 * 60 + minutes
+  }
+
+  // Helper function to convert minutes from midnight to 12-hour time format with AM/PM
+  const convertMinutesToTime = (minutes: number): string => {
+    const hours24 = Math.floor(minutes / 60)
+    const minutesLeft = minutes % 60
+    const isPM = hours24 >= 12
+    const hours12 = hours24 % 12 || 12 // Convert 0 to 12 for 12-hour format
+    const period = isPM ? 'PM' : 'AM'
+    return `${hours12.toString().padStart(2, '0')}:${minutesLeft
+      .toString()
+      .padStart(2, '0')} ${period}`
+  }
+
   // Extract start time and end time from payload
-  const startTimeString = payload?.startTime // e.g., "09:00"
-  const endTimeString = payload?.endTime // e.g., "14:00"
+  const startTimeString = payload?.startTime // e.g., "09:00 AM"
+  const endTimeString = payload?.endTime // e.g., "02:00 PM"
 
   // Convert times to total minutes from midnight
-  const startTimeInMins =
-    Number(startTimeString.split(':')[0]) * 60 +
-    Number(startTimeString.split(':')[1])
-
-  const endTimeInMins =
-    Number(endTimeString.split(':')[0]) * 60 +
-    Number(endTimeString.split(':')[1])
+  const startTimeInMins = convertTimeToMinutes(startTimeString)
+  const endTimeInMins = convertTimeToMinutes(endTimeString)
 
   // Calculate total duration in minutes
   const totalDuration = endTimeInMins - startTimeInMins
@@ -57,14 +73,8 @@ const createSlotIntoDB = async (payload: TSlot) => {
     const intervalStartMins = currentStartTimeInMins
     const intervalEndMins = intervalStartMins + serviceDuration
 
-    const startTime = `${Math.floor(intervalStartMins / 60)
-      .toString()
-      .padStart(2, '0')}:${(intervalStartMins % 60)
-      .toString()
-      .padStart(2, '0')}`
-    const endTime = `${Math.floor(intervalEndMins / 60)
-      .toString()
-      .padStart(2, '0')}:${(intervalEndMins % 60).toString().padStart(2, '0')}`
+    const startTime = convertMinutesToTime(intervalStartMins)
+    const endTime = convertMinutesToTime(intervalEndMins)
 
     timeIntervals.push({ startTime, endTime })
 
