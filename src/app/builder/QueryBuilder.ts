@@ -41,6 +41,16 @@ class QueryBuilder<T> {
 
     excludeFields.forEach((el) => delete queryObj[el])
 
+    // Handle specific filters like date and serviceId
+    if (queryObj.date) {
+      queryObj.date = new Date(queryObj.date as string) // Convert to Date object
+    }
+
+    if (queryObj.serviceId) {
+      queryObj.service = queryObj.serviceId // Map serviceId to service
+      delete queryObj.serviceId // Remove redundant serviceId field
+    }
+
     // Handle price range
     if (this.query.minPrice || this.query.maxPrice) {
       const priceRange: Record<string, number> = {}

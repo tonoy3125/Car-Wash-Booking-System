@@ -3,6 +3,7 @@ import { AppError } from '../../errors/AppError'
 import { Service } from '../service/service.model'
 import { TSlot } from './slot.interface'
 import { Slot } from './slot.model'
+import QueryBuilder from '../../builder/QueryBuilder'
 
 const createSlotIntoDB = async (payload: TSlot) => {
   // Check if the service exists by this ID
@@ -96,21 +97,39 @@ const createSlotIntoDB = async (payload: TSlot) => {
 }
 
 const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
-  const queryObj: Partial<{ service: string; date: string }> = {}
-  //   console.log(queryObj)
-  if (query?.date) {
-    queryObj.date = query.date as string
+  const slotQuery = new QueryBuilder(Slot.find().populate('service'), query)
+    // .search(serviceSearchableField)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+
+  const meta = await slotQuery.countTotal()
+  const result = await slotQuery.modelQuery.exec()
+  console.log('slot result', result)
+
+  return {
+    meta,
+    result,
   }
-
-  if (query?.serviceId) {
-    queryObj.service = query.serviceId as string
-  }
-
-  const result = await Slot.find(queryObj).populate('service')
-  //   console.log(result)
-
-  return result
 }
+
+// const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
+//   const queryObj: Partial<{ service: string; date: string }> = {}
+//   //   console.log(queryObj)
+//   if (query?.date) {
+//     queryObj.date = query.date as string
+//   }
+
+//   if (query?.serviceId) {
+//     queryObj.service = query.serviceId as string
+//   }
+
+//   const result = await Slot.find(queryObj).populate('service')
+//   //   console.log(result)
+
+//   return result
+// }
 
 export const SlotServices = {
   createSlotIntoDB,
