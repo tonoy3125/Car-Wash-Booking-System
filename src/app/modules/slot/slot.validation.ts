@@ -10,6 +10,16 @@ const createSlotValidationSchema = z.object({
   }),
 })
 
+const updateSlotStatusValidationSchema = z.object({
+  body: z.object({
+    isBooked: z.enum(['available', 'booked', 'canceled'], {
+      required_error:
+        'Status is required and must be AVAILABLE, BOOKED, or CANCELED',
+    }),
+  }),
+})
+
 export const SlotValidations = {
   createSlotValidationSchema,
+  updateSlotStatusValidationSchema,
 }

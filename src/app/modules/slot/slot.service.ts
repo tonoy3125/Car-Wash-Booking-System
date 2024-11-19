@@ -1,7 +1,7 @@
 import httpStatus from 'http-status'
 import { AppError } from '../../errors/AppError'
 import { Service } from '../service/service.model'
-import { TSlot } from './slot.interface'
+import { TIsBooked, TSlot } from './slot.interface'
 import { Slot } from './slot.model'
 import QueryBuilder from '../../builder/QueryBuilder'
 
@@ -114,24 +114,39 @@ const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   }
 }
 
-// const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
-//   const queryObj: Partial<{ service: string; date: string }> = {}
-//   //   console.log(queryObj)
-//   if (query?.date) {
-//     queryObj.date = query.date as string
-//   }
+const updateSlotStatusInDB = async (id: string, newIsBooked: TIsBooked) => {
+  const validStatus = ['available', 'canceled'] // Admin can only toggle these states
 
-//   if (query?.serviceId) {
-//     queryObj.service = query.serviceId as string
-//   }
+  if (!validStatus.includes(newIsBooked)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid slot status for admin update',
+    )
+  }
 
-//   const result = await Slot.find(queryObj).populate('service')
-//   //   console.log(result)
+  const slot = await Slot.findById(id)
 
-//   return result
-// }
+  if (!slot) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Slot not found')
+  }
+
+  // Prevent updates to 'booked' slots
+  if (slot.isBooked === 'booked') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot update the status of a booked slot',
+    )
+  }
+
+  // Update status
+  slot.isBooked = newIsBooked
+  const updatedSlot = await slot.save()
+
+  return updatedSlot
+}
 
 export const SlotServices = {
   createSlotIntoDB,
   getAvailableSlotsFromDB,
+  updateSlotStatusInDB,
 }

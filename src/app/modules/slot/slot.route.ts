@@ -14,6 +14,13 @@ router.post(
   SlotControllers.createSlot,
 )
 
+router.patch(
+  '/isBooked/:id',
+  auth(USER_ROLE.admin), // Ensure only admins can access this endpoint
+  validateRequest(SlotValidations.updateSlotStatusValidationSchema), // Apply validation schema
+  SlotControllers.updateSlotStatus, // Update status logic
+)
+
 const router2 = express.Router()
 
 router2.get('/', SlotControllers.getAvailableSlots)
