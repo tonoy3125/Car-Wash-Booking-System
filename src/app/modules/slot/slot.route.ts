@@ -21,6 +21,8 @@ router.patch(
   SlotControllers.updateSlotStatus, // Update status logic
 )
 
+router.delete('/:id', auth(USER_ROLE.admin), SlotControllers.deleteSlot)
+
 const router2 = express.Router()
 
 router2.get('/', SlotControllers.getAvailableSlots)

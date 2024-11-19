@@ -40,8 +40,20 @@ const updateSlotStatus = catchAsync(async (req, res) => {
   })
 })
 
+const deleteSlot = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const result = await SlotServices.deleteSlotFromDB(id)
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Slot Deleted Successfully!',
+    data: result,
+  })
+})
+
 export const SlotControllers = {
   createSlot,
   getAvailableSlots,
   updateSlotStatus,
+  deleteSlot,
 }

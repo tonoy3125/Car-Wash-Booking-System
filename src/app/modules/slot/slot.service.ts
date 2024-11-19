@@ -145,8 +145,20 @@ const updateSlotStatusInDB = async (id: string, newIsBooked: TIsBooked) => {
   return updatedSlot
 }
 
+const deleteSlotFromDB = async (id: string) => {
+  const slot = await Slot.findById(id)
+
+  if (!slot) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Slot Not Found by this ID')
+  }
+
+  const result = await Slot.findByIdAndDelete(id)
+  return result
+}
+
 export const SlotServices = {
   createSlotIntoDB,
   getAvailableSlotsFromDB,
   updateSlotStatusInDB,
+  deleteSlotFromDB,
 }
