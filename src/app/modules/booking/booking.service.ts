@@ -7,7 +7,6 @@ import { Service } from '../service/service.model'
 import { Slot } from '../slot/slot.model'
 import { Booking } from './booking.model'
 import QueryBuilder from '../../builder/QueryBuilder'
-import { bookingSearchableField } from './booking.constant'
 
 const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
   const userData = await User.findOne({ email: user?.email, role: user?.role })
@@ -76,16 +75,19 @@ const getAllBookingsFromDB = async (query: Record<string, unknown>) => {
   }
 
   // Create the main query
-  const bookingQuery = new QueryBuilder(
-    Booking.find({
+  const baseQuery = Booking.find()
+
+  if (searchTerm) {
+    baseQuery.where({
       $or: [
         { customer: { $in: customerIds } },
         { service: { $in: serviceIds } },
       ],
     })
-      .populate('customer')
-      .populate('service')
-      .populate('slot'),
+  }
+
+  const bookingQuery = new QueryBuilder(
+    baseQuery.populate('customer').populate('service').populate('slot'),
     query,
   )
     .filter()

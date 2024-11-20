@@ -3,6 +3,7 @@ import { AuthRoutes } from '../modules/auth/auth.route'
 import { ServiceRoutes } from '../modules/service/service.route'
 import { SlotRoutes, SlotRoutes2 } from '../modules/slot/slot.route'
 import { BookingRoutes, BookingRoutes2 } from '../modules/booking/booking.route'
+import { UserRoutes } from '../modules/user/user.route'
 
 const router = express.Router()
 
@@ -10,6 +11,10 @@ const routerModules = [
   {
     path: '/auth',
     route: AuthRoutes,
+  },
+  {
+    path: '/users',
+    route: UserRoutes,
   },
   {
     path: '/services',
