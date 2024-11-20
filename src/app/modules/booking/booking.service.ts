@@ -6,6 +6,8 @@ import httpStatus from 'http-status'
 import { Service } from '../service/service.model'
 import { Slot } from '../slot/slot.model'
 import { Booking } from './booking.model'
+import QueryBuilder from '../../builder/QueryBuilder'
+import { bookingSearchableField } from './booking.constant'
 
 const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
   const userData = await User.findOne({ email: user?.email, role: user?.role })
@@ -51,12 +53,27 @@ const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
   return result
 }
 
-const getAllBookingsFromDB = async () => {
-  const result = await Booking.find()
-    .populate('customer')
-    .populate('service')
-    .populate('slot')
-  return result
+const getAllBookingsFromDB = async (query: Record<string, unknown>) => {
+  const bookingQuery = new QueryBuilder(
+    Booking.find().populate('customer').populate('service').populate('slot'),
+    query,
+  )
+    .search(bookingSearchableField)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+
+  // const result = await Service.find()
+  // return result
+
+  const meta = await bookingQuery.countTotal()
+  const result = await bookingQuery.modelQuery
+
+  return {
+    meta,
+    result,
+  }
 }
 
 const getUserBookingFromDB = async (user: JwtPayload) => {

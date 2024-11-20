@@ -16,14 +16,13 @@ const createBooking = catchAsync(async (req, res) => {
 })
 
 const getAllBookings = catchAsync(async (req, res) => {
-  const result = await BookingServices.getAllBookingsFromDB()
+  const result = await BookingServices.getAllBookingsFromDB(req?.query)
   sendResponse(res, {
-    success: result.length ? true : false,
-    statusCode: result.length ? httpStatus.OK : httpStatus.NOT_FOUND,
-    message: result.length
-      ? 'All bookings retrieved successfully'
-      : 'No Data Found',
-    data: result,
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'All bookings retrieved Successfully!',
+    meta: result.meta,
+    data: result.result,
   })
 })
 

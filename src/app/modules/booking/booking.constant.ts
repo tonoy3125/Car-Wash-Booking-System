@@ -1,3 +1,5 @@
+export const bookingSearchableField = ['name']
+
 export const vehicleTypes = [
   'car',
   'truck',
