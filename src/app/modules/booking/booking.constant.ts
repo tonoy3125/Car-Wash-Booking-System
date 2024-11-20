@@ -1,4 +1,4 @@
-export const bookingSearchableField = ['name']
+export const bookingSearchableField = ['customer.name', 'service.name']
 
 export const vehicleTypes = [
   'car',

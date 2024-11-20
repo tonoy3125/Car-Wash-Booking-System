@@ -54,19 +54,46 @@ const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
 }
 
 const getAllBookingsFromDB = async (query: Record<string, unknown>) => {
+  const searchTerm = query?.searchTerm as string
+
+  let customerIds: string[] = []
+  let serviceIds: string[] = []
+
+  // Search in related collections
+  if (searchTerm) {
+    // Find matching customers by name
+    const matchingCustomers = await User.find({
+      name: { $regex: searchTerm, $options: 'i' },
+    }).select('_id')
+
+    // Find matching services by name
+    const matchingServices = await Service.find({
+      name: { $regex: searchTerm, $options: 'i' },
+    }).select('_id')
+
+    customerIds = matchingCustomers.map((customer) => customer._id.toString())
+    serviceIds = matchingServices.map((service) => service._id.toString())
+  }
+
+  // Create the main query
   const bookingQuery = new QueryBuilder(
-    Booking.find().populate('customer').populate('service').populate('slot'),
+    Booking.find({
+      $or: [
+        { customer: { $in: customerIds } },
+        { service: { $in: serviceIds } },
+      ],
+    })
+      .populate('customer')
+      .populate('service')
+      .populate('slot'),
     query,
   )
-    .search(bookingSearchableField)
     .filter()
     .sort()
     .paginate()
     .fields()
 
-  // const result = await Service.find()
-  // return result
-
+  // Fetch metadata and result
   const meta = await bookingQuery.countTotal()
   const result = await bookingQuery.modelQuery
 
