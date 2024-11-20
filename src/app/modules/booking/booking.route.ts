@@ -16,6 +16,8 @@ router.post(
 
 router.get('/', auth(USER_ROLE.admin), BookingControllers.getAllBookings)
 
+router.delete('/:id', auth(USER_ROLE.admin), BookingControllers.deleteBooking)
+
 const router2 = express.Router()
 
 router2.get('/', auth(USER_ROLE.user), BookingControllers.getUserBooking)
