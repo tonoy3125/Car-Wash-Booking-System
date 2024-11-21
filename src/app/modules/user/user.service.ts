@@ -21,6 +21,29 @@ const getAllUserFromDB = async (query: Record<string, unknown>) => {
   }
 }
 
+const updateUserRoleInDB = async (id: string, newRole: string) => {
+  // Fetch the user by ID
+  const user = await User.findById(id)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID')
+  }
+
+  // Check if the current role is the same as the new role
+  if (user.role === newRole) {
+    return { message: `Role was already ${newRole}` }
+  }
+
+  // Update the user's role
+  const updatedUser = await User.findByIdAndUpdate(
+    id,
+    { role: newRole },
+    { new: true, runValidators: true },
+  )
+
+  return updatedUser
+}
+
 const deleteUserFromDB = async (id: string) => {
   const user = await User.findById(id)
 
@@ -34,5 +57,6 @@ const deleteUserFromDB = async (id: string) => {
 
 export const UserServices = {
   getAllUserFromDB,
+  updateUserRoleInDB,
   deleteUserFromDB,
 }
