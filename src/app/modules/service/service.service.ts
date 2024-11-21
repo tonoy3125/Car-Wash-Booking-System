@@ -32,9 +32,6 @@ const getAllServiceFromDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields()
 
-  // const result = await Service.find()
-  // return result
-
   const meta = await serviceQuery.countTotal()
   const result = await serviceQuery.modelQuery
 

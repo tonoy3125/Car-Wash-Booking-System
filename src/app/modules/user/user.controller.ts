@@ -14,6 +14,18 @@ const getAllUser = catchAsync(async (req, res) => {
   })
 })
 
+const deleteUser = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const result = await UserServices.deleteUserFromDB(id)
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User Deleted Successfully!',
+    data: result,
+  })
+})
+
 export const UserControllers = {
   getAllUser,
+  deleteUser,
 }
