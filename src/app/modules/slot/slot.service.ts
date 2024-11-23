@@ -114,6 +114,23 @@ const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   }
 }
 
+const getSlotsByServiceFromDB = async (serviceId: string) => {
+  // Find slots that match the given service ID
+  const slots = await Slot.find({
+    service: serviceId,
+    isBooked: { $in: ['available', 'canceled'] },
+  }).populate('service')
+
+  if (!slots || slots.length === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'No slots found for this service ID',
+    )
+  }
+
+  return slots
+}
+
 const updateSlotStatusInDB = async (id: string, newIsBooked: TIsBooked) => {
   const validStatus = ['available', 'canceled'] // Admin can only toggle these states
 
@@ -159,6 +176,7 @@ const deleteSlotFromDB = async (id: string) => {
 export const SlotServices = {
   createSlotIntoDB,
   getAvailableSlotsFromDB,
+  getSlotsByServiceFromDB,
   updateSlotStatusInDB,
   deleteSlotFromDB,
 }

@@ -26,6 +26,19 @@ const getAvailableSlots = catchAsync(async (req, res) => {
   })
 })
 
+const getSlotsByService = catchAsync(async (req, res) => {
+  const { serviceId } = req.params // Extract service ID from route params
+
+  const result = await SlotServices.getSlotsByServiceFromDB(serviceId)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Slots retrieved successfully for the specified service!',
+    data: result,
+  })
+})
+
 const updateSlotStatus = catchAsync(async (req, res) => {
   const { id } = req.params // Slot ID
   const { isBooked } = req.body // New status (available or canceled)
@@ -54,6 +67,7 @@ const deleteSlot = catchAsync(async (req, res) => {
 export const SlotControllers = {
   createSlot,
   getAvailableSlots,
+  getSlotsByService,
   updateSlotStatus,
   deleteSlot,
 }

@@ -26,6 +26,7 @@ router.delete('/:id', auth(USER_ROLE.admin), SlotControllers.deleteSlot)
 const router2 = express.Router()
 
 router2.get('/', SlotControllers.getAvailableSlots)
+router2.get('/service/:serviceId', SlotControllers.getSlotsByService)
 
 export const SlotRoutes = router
 export const SlotRoutes2 = router2
