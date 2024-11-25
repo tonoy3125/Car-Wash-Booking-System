@@ -119,7 +119,9 @@ const getSlotsByServiceFromDB = async (serviceId: string) => {
   const slots = await Slot.find({
     service: serviceId,
     isBooked: { $in: ['available', 'canceled'] },
-  }).populate('service')
+  })
+    .populate('service')
+    .exec()
 
   if (!slots || slots.length === 0) {
     throw new AppError(
