@@ -114,14 +114,21 @@ const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   }
 }
 
-const getSlotsByServiceFromDB = async (serviceId: string) => {
-  // Find slots that match the given service ID
-  const slots = await Slot.find({
-    service: serviceId,
-    isBooked: { $in: ['available', 'canceled'] },
-  })
-    .populate('service')
-    .exec()
+const getSlotsByServiceFromDB = async (
+  serviceId: string,
+  query: Record<string, unknown>,
+) => {
+  // Initialize QueryBuilder
+  const queryBuilder = new QueryBuilder(
+    Slot.find({ service: serviceId }),
+    query,
+  )
+
+  // Apply additional filter for isBooked status to only include 'available' or 'canceled' slots
+  queryBuilder.modelQuery.where('isBooked').in(['available', 'canceled'])
+
+  // Populate related fields and execute the query
+  const slots = await queryBuilder.modelQuery.populate('service').exec()
 
   if (!slots || slots.length === 0) {
     throw new AppError(

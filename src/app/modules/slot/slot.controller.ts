@@ -28,8 +28,9 @@ const getAvailableSlots = catchAsync(async (req, res) => {
 
 const getSlotsByService = catchAsync(async (req, res) => {
   const { serviceId } = req.params // Extract service ID from route params
+  const query = req.query // Extract query parameters (e.g., startTime, endTime)
 
-  const result = await SlotServices.getSlotsByServiceFromDB(serviceId)
+  const result = await SlotServices.getSlotsByServiceFromDB(serviceId, query)
 
   sendResponse(res, {
     success: true,

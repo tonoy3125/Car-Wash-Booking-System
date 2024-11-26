@@ -37,6 +37,8 @@ class QueryBuilder<T> {
       'fields',
       'minPrice',
       'maxPrice',
+      'startTime',
+      'endTime',
     ]
 
     excludeFields.forEach((el) => delete queryObj[el])
@@ -58,6 +60,15 @@ class QueryBuilder<T> {
       if (this.query.maxPrice) priceRange['$lte'] = Number(this.query.maxPrice)
 
       queryObj.price = priceRange
+    }
+
+    // Handle time range filtering
+    if (this.query.startTime || this.query.endTime) {
+      const timeRange: Record<string, string> = {}
+      if (this.query.startTime) timeRange['$gte'] = this.query.startTime
+      if (this.query.endTime) timeRange['$lte'] = this.query.endTime
+
+      queryObj.startTime = timeRange // Ensure `startTime` is part of your model fields
     }
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>)
