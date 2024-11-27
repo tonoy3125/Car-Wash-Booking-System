@@ -120,12 +120,18 @@ const getSlotsByServiceFromDB = async (
 ) => {
   // Initialize QueryBuilder
   const queryBuilder = new QueryBuilder(
-    Slot.find({ service: serviceId }),
+    Slot.find({
+      service: serviceId,
+      isBooked: { $in: ['available', 'canceled'] },
+    }),
     query,
   )
 
   // Apply additional filter for isBooked status to only include 'available' or 'canceled' slots
-  queryBuilder.modelQuery.where('isBooked').in(['available', 'canceled'])
+  // Apply filters, including startTime and endTime
+  queryBuilder.filter()
+
+  queryBuilder.modelQuery.sort({ startTime: 1 })
 
   // Populate related fields and execute the query
   const slots = await queryBuilder.modelQuery.populate('service').exec()
