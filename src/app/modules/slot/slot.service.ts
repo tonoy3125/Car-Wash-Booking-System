@@ -118,11 +118,18 @@ const getSlotsByServiceFromDB = async (
   serviceId: string,
   query: Record<string, unknown>,
 ) => {
+  // Get today's date at midnight (00:00:00) for comparison
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   // Initialize QueryBuilder
   const queryBuilder = new QueryBuilder(
     Slot.find({
       service: serviceId,
-      isBooked: { $in: ['available', 'canceled'] },
+      $or: [
+        { isBooked: { $in: ['available', 'canceled'] } },
+        { isBooked: 'booked', date: { $gte: today } },
+      ],
     }),
     query,
   )

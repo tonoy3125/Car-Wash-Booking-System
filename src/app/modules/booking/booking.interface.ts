@@ -30,4 +30,5 @@ export type TBookingForReq = {
   vehicleModel: string
   manufacturingYear: number
   registrationPlate: string
+  payment: 'paid' | 'pending'
 }
