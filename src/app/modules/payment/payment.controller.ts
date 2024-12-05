@@ -93,18 +93,13 @@ const successPaymentController = catchAsync(async (req, res) => {
   try {
     const result = await PaymentServices.successPayment(paymentInfoToken)
 
-    return sendResponse(res, {
-      data: result,
-      success: true,
-      message: 'Payment successful',
-      statusCode: httpStatus.OK,
-    })
+    res.status(httpStatus.OK).send(result.successTemplate)
   } catch (error) {
     return sendResponse(res, {
-      data: null,
       success: false,
-      message: error.message || 'An error occurred while processing payment',
       statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: 'An error occurred while processing payment',
+      data: null,
     })
   }
 })

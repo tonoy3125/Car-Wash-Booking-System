@@ -52,17 +52,16 @@ const successPayment = async (paymentInfoToken: string) => {
 
   console.log('Updated payment:', paymentUpdate)
 
-  // Read and process the success email template
+  // Correctly process the email template
   const filePath = join(__dirname, '../../templates/success.html')
-  console.log('Template file path:', filePath)
-  let file = readFileSync(filePath, 'utf-8')
-  file = file.replace('{{link}}', 'http://localhost:5000/')
+  const template = readFileSync(filePath, 'utf-8')
+  const successTemplate = template.replace('{{link}}', 'http://localhost:5000/')
 
   // Return the updated information along with the processed email template
   return {
     bookings: bookingsUpdate,
     payment: paymentUpdate,
-    successTemplate: file,
+    successTemplate,
     transactionId,
     amount,
   }
