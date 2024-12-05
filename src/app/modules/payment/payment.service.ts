@@ -18,10 +18,10 @@ const successPayment = async (paymentInfoToken: string) => {
     process.env.SIGNATURE_KEY as string,
   ) as IPaymentTokenInfo
 
-  console.log('Decoded JWT:', decode)
+  // console.log('Decoded JWT:', decode)
 
   const { transactionId, amount, customer } = decode // Ensure `userId` is included in the token
-  console.log('User ID:', customer)
+  // console.log('User ID:', customer)
 
   if (!customer) {
     throw new Error('User ID is required to update bookings')
@@ -38,7 +38,7 @@ const successPayment = async (paymentInfoToken: string) => {
     throw new Error('No bookings found or update failed for the user')
   }
 
-  console.log('Updated bookings:', bookingsUpdate)
+  // console.log('Updated bookings:', bookingsUpdate)
 
   // Update the payment status to 'Paid'
   const paymentUpdate = await Payment.findOneAndUpdate(
@@ -51,7 +51,7 @@ const successPayment = async (paymentInfoToken: string) => {
     throw new Error('Payment not found or update failed')
   }
 
-  console.log('Updated payment:', paymentUpdate)
+  // console.log('Updated payment:', paymentUpdate)
 
   // Correctly process the email template
   const filePath = join(__dirname, '../../templates/success.html')

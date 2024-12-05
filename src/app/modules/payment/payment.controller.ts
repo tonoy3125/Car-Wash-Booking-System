@@ -4,9 +4,6 @@ import sendResponse from '../../utils/sendResponse'
 import { initiatePayment } from './payment.utils'
 import { PaymentServices } from './payment.service'
 import { User } from '../user/user.model'
-import { jwt } from 'jsonwebtoken'
-import { IPaymentTokenInfo } from './payment.interface'
-import { Booking } from '../booking/booking.model'
 
 const createPayment = catchAsync(async (req, res) => {
   const { bookingIds, customerId, amount } = req.body

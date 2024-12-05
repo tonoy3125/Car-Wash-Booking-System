@@ -33,7 +33,7 @@ export const initiatePayment = async (payload: IPaymentPayload) => {
     desc: 'Course Fee',
     type: 'json',
   })
-  console.log('Payment gateway response:', response.data)
+  // console.log('Payment gateway response:', response.data)
 
   return response.data
 }
