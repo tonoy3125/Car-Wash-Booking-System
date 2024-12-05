@@ -55,7 +55,7 @@ const successPayment = async (paymentInfoToken: string) => {
   // Correctly process the email template
   const filePath = join(__dirname, '../../templates/success.html')
   const template = readFileSync(filePath, 'utf-8')
-  const successTemplate = template.replace('{{link}}', 'http://localhost:5000/')
+  const successTemplate = template.replace('{{link}}', 'http://localhost:5173/')
 
   // Return the updated information along with the processed email template
   return {

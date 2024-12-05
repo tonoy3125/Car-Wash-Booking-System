@@ -21,6 +21,11 @@ router.delete('/:id', auth(USER_ROLE.admin), BookingControllers.deleteBooking)
 const router2 = express.Router()
 
 router2.get('/', auth(USER_ROLE.user), BookingControllers.getUserBooking)
+router2.get(
+  '/pending',
+  auth(USER_ROLE.user),
+  BookingControllers.getUserPendingBooking,
+)
 
 export const BookingRoutes = router
 export const BookingRoutes2 = router2

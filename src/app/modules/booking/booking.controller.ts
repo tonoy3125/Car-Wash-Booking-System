@@ -30,11 +30,20 @@ const getUserBooking = catchAsync(async (req, res) => {
   const user = req?.user
   const result = await BookingServices.getUserBookingFromDB(user)
   sendResponse(res, {
-    success: result.length ? true : false,
-    statusCode: result.length ? httpStatus.OK : httpStatus.NOT_FOUND,
-    message: result.length
-      ? 'User bookings retrieved successfully'
-      : 'No Data Found',
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User All Bookings retrieved successfully!',
+    data: result,
+  })
+})
+
+const getUserPendingBooking = catchAsync(async (req, res) => {
+  const user = req?.user
+  const result = await BookingServices.getUserPendingBookingFromDB(user)
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User Pending Bookings retrieved successfully!',
     data: result,
   })
 })
@@ -54,5 +63,6 @@ export const BookingControllers = {
   createBooking,
   getAllBookings,
   getUserBooking,
+  getUserPendingBooking,
   deleteBooking,
 }

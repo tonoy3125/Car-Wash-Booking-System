@@ -113,6 +113,24 @@ const getUserBookingFromDB = async (user: JwtPayload) => {
   return result
 }
 
+const getUserPendingBookingFromDB = async (user: JwtPayload) => {
+  const userData = await User.findOne({ email: user?.email, role: user?.role })
+
+  // Make sure that user data is found before proceeding
+  if (!userData) {
+    throw new Error('User not found')
+  }
+
+  const result = await Booking.find({
+    customer: userData._id,
+    payment: 'Pending', // Assuming 'Pending' is the status for payment pending
+  })
+    .populate('service')
+    .populate('slot')
+
+  return result
+}
+
 const deleteBookingFromDB = async (id: string) => {
   const booking = await Booking.findById(id)
 
@@ -128,5 +146,6 @@ export const BookingServices = {
   createBookingInDB,
   getAllBookingsFromDB,
   getUserBookingFromDB,
+  getUserPendingBookingFromDB,
   deleteBookingFromDB,
 }
