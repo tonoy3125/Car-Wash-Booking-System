@@ -10,4 +10,10 @@ router.post(
   PaymentControllers.createPayment,
 )
 
+router.post(
+  '/success',
+  //   auth('admin', 'user'),
+  PaymentControllers.successPaymentController,
+)
+
 export const PaymentRoutes = router

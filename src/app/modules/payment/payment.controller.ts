@@ -4,6 +4,9 @@ import sendResponse from '../../utils/sendResponse'
 import { initiatePayment } from './payment.utils'
 import { PaymentServices } from './payment.service'
 import { User } from '../user/user.model'
+import { jwt } from 'jsonwebtoken'
+import { IPaymentTokenInfo } from './payment.interface'
+import { Booking } from '../booking/booking.model'
 
 const createPayment = catchAsync(async (req, res) => {
   const { bookingIds, customerId, amount } = req.body
@@ -35,6 +38,7 @@ const createPayment = catchAsync(async (req, res) => {
     phone: cus_phone,
     email: cus_email,
     address: cus_add,
+    id: customer,
   } = user
 
   // Generate a unique transaction ID
@@ -48,6 +52,7 @@ const createPayment = catchAsync(async (req, res) => {
     cus_phone,
     cus_email,
     cus_add,
+    customer,
   })
 
   if (paymentResponse?.payment_url) {
@@ -81,6 +86,30 @@ const createPayment = catchAsync(async (req, res) => {
   }
 })
 
+const successPaymentController = catchAsync(async (req, res) => {
+  const paymentInfoToken = req.query.pt as string
+  // console.log('Payment Info Token:', req.query.pt)
+
+  try {
+    const result = await PaymentServices.successPayment(paymentInfoToken)
+
+    return sendResponse(res, {
+      data: result,
+      success: true,
+      message: 'Payment successful',
+      statusCode: httpStatus.OK,
+    })
+  } catch (error) {
+    return sendResponse(res, {
+      data: null,
+      success: false,
+      message: error.message || 'An error occurred while processing payment',
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+    })
+  }
+})
+
 export const PaymentControllers = {
   createPayment,
+  successPaymentController,
 }

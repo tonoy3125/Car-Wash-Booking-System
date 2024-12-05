@@ -5,7 +5,7 @@ export interface IPayment {
   booking: Types.ObjectId[]
   amount: number
   transactionId: string
-  // status: string
+  status?: string
 }
 export interface IPaymentPayload {
   amount: number
@@ -14,9 +14,11 @@ export interface IPaymentPayload {
   cus_phone: number
   cus_add: string
   tran_id: string
+  customer: string
 }
 
 export interface IPaymentTokenInfo {
   transactionId: string
+  customer: string
   amount: number
 }
