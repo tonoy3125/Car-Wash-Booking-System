@@ -104,7 +104,26 @@ const successPaymentController = catchAsync(async (req, res) => {
   }
 })
 
+const failPaymentController = catchAsync(async (req, res) => {
+  const paymentInfoToken = req.query.pt as string
+  // console.log('Payment Info Token:', req.query.pt)
+
+  try {
+    const result = await PaymentServices.errorPayment(paymentInfoToken)
+
+    res.status(httpStatus.OK).send(result.errorTemplate)
+  } catch (error) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: 'An error occurred while processing payment',
+      data: null,
+    })
+  }
+})
+
 export const PaymentControllers = {
   createPayment,
   successPaymentController,
+  failPaymentController,
 }

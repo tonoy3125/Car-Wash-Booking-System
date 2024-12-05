@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { IPayment, IPaymentTokenInfo } from './payment.interface'
 import Payment from './payment.model'
 import { readFileSync } from 'fs'
@@ -67,7 +68,29 @@ const successPayment = async (paymentInfoToken: string) => {
   }
 }
 
+const errorPayment = async (paymentInfoToken: string) => {
+  // Decode the payment information token
+  const decode = jwt.verify(
+    paymentInfoToken,
+    process.env.SIGNATURE_KEY as string,
+  ) as IPaymentTokenInfo
+
+  // Correctly process the email template
+  const filePath = join(__dirname, '../../templates/error.html')
+  const template = readFileSync(filePath, 'utf-8')
+  const errorTemplate = template.replace(
+    '{{link}}',
+    'http://localhost:5173/booking',
+  )
+
+  // Return the updated information along with the processed email template
+  return {
+    errorTemplate,
+  }
+}
+
 export const PaymentServices = {
   createPaymentIntoDB,
   successPayment,
+  errorPayment,
 }

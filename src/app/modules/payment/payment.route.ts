@@ -16,4 +16,6 @@ router.post(
   PaymentControllers.successPaymentController,
 )
 
+router.post('/fail', PaymentControllers.failPaymentController)
+
 export const PaymentRoutes = router
