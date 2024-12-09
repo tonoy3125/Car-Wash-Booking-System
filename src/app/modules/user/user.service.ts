@@ -3,6 +3,7 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import { AppError } from '../../errors/AppError'
 import { userSearchableField } from './user.constant'
 import { User } from './user.model'
+import { TUser } from './user.interface'
 
 const getAllUserFromDB = async (query: Record<string, unknown>) => {
   const userQuery = new QueryBuilder(User.find(), query)
@@ -44,6 +45,23 @@ const updateUserRoleInDB = async (id: string, newRole: string) => {
   return updatedUser
 }
 
+const updateUserIntoDB = async (id: string, payload: TUser) => {
+  // Fetch the user by ID
+  const user = await User.findById(id)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID')
+  }
+
+  // Update the user's details
+  const updatedUser = await User.findByIdAndUpdate(id, payload, {
+    new: true, // Return the updated document
+    runValidators: true, // Run schema validators
+  })
+
+  return updatedUser
+}
+
 const deleteUserFromDB = async (id: string) => {
   const user = await User.findById(id)
 
@@ -58,5 +76,6 @@ const deleteUserFromDB = async (id: string) => {
 export const UserServices = {
   getAllUserFromDB,
   updateUserRoleInDB,
+  updateUserIntoDB,
   deleteUserFromDB,
 }

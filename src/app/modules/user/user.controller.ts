@@ -27,6 +27,20 @@ const updateUserRole = catchAsync(async (req, res) => {
   })
 })
 
+const updateUser = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const payload = req.body // All updated fields should be passed in the request body
+
+  const result = await UserServices.updateUserIntoDB(id, payload)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User Updated Successfully!',
+    data: result,
+  })
+})
+
 const deleteUser = catchAsync(async (req, res) => {
   const { id } = req.params
   const result = await UserServices.deleteUserFromDB(id)
@@ -41,5 +55,6 @@ const deleteUser = catchAsync(async (req, res) => {
 export const UserControllers = {
   getAllUser,
   updateUserRole,
+  updateUser,
   deleteUser,
 }
