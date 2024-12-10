@@ -2,6 +2,8 @@ import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
 import { UserServices } from './user.service'
 import sendResponse from '../../utils/sendResponse'
+import { User } from './user.model'
+import { AppError } from '../../errors/AppError'
 
 const getAllUser = catchAsync(async (req, res) => {
   const result = await UserServices.getAllUserFromDB(req?.query)
@@ -42,12 +44,25 @@ const updateUser = catchAsync(async (req, res) => {
   const { id } = req.params
   const payload = req.body // All updated fields should be passed in the request body
 
+  // Fetch the user by ID to determine their role
+  const user = await User.findById(id)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID')
+  }
+
   const result = await UserServices.updateUserIntoDB(id, payload)
+
+  // Determine the success message based on the user's role
+  const message =
+    user.role === 'admin'
+      ? 'Admin Profile Updated Successfully!'
+      : 'User Profile Updated Successfully!'
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'User Updated Successfully!',
+    message,
     data: result,
   })
 })
