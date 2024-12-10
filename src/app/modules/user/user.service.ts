@@ -22,6 +22,11 @@ const getAllUserFromDB = async (query: Record<string, unknown>) => {
   }
 }
 
+const getSingleUserFromDB = async (id: string) => {
+  const result = await User.findById(id)
+  return result
+}
+
 const updateUserRoleInDB = async (id: string, newRole: string) => {
   // Fetch the user by ID
   const user = await User.findById(id)
@@ -46,6 +51,14 @@ const updateUserRoleInDB = async (id: string, newRole: string) => {
 }
 
 const updateUserIntoDB = async (id: string, payload: TUser) => {
+  // Check if the payload includes the role field
+  if ('role' in payload) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Updating the role is not allowed',
+    )
+  }
+
   // Fetch the user by ID
   const user = await User.findById(id)
 
@@ -75,6 +88,7 @@ const deleteUserFromDB = async (id: string) => {
 
 export const UserServices = {
   getAllUserFromDB,
+  getSingleUserFromDB,
   updateUserRoleInDB,
   updateUserIntoDB,
   deleteUserFromDB,

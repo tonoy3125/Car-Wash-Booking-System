@@ -7,6 +7,8 @@ const router = express.Router()
 
 router.get('/', auth(USER_ROLE.admin), UserControllers.getAllUser)
 
+router.get('/:id', auth('admin', 'user'), UserControllers.getSingleUser)
+
 router.patch('/role/:id', auth(USER_ROLE.admin), UserControllers.updateUserRole)
 router.patch('/:id', auth('admin', 'user'), UserControllers.updateUser)
 
