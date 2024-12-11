@@ -48,6 +48,19 @@ const getUserPendingBooking = catchAsync(async (req, res) => {
   })
 })
 
+const getUserPastBooking = catchAsync(async (req, res) => {
+  const user = req?.user
+  const query = req?.query
+  const result = await BookingServices.getUserPastBookingFromDB(user, query)
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User Past Bookings retrieved successfully!',
+    meta: result.meta,
+    data: result.result,
+  })
+})
+
 const deleteBooking = catchAsync(async (req, res) => {
   const { id } = req.params
   const result = await BookingServices.deleteBookingFromDB(id)
@@ -64,5 +77,6 @@ export const BookingControllers = {
   getAllBookings,
   getUserBooking,
   getUserPendingBooking,
+  getUserPastBooking,
   deleteBooking,
 }

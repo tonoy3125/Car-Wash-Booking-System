@@ -27,5 +27,11 @@ router2.get(
   BookingControllers.getUserPendingBooking,
 )
 
+router2.get(
+  '/my-past-bookings',
+  auth(USER_ROLE.user),
+  BookingControllers.getUserPastBooking,
+)
+
 export const BookingRoutes = router
 export const BookingRoutes2 = router2

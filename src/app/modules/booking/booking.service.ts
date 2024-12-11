@@ -7,6 +7,7 @@ import { Service } from '../service/service.model'
 import { Slot } from '../slot/slot.model'
 import { Booking } from './booking.model'
 import QueryBuilder from '../../builder/QueryBuilder'
+import { PipelineStage } from 'mongoose'
 
 const createBookingInDB = async (payload: TBookingForReq, user: JwtPayload) => {
   const userData = await User.findOne({ email: user?.email, role: user?.role })
@@ -131,6 +132,105 @@ const getUserPendingBookingFromDB = async (user: JwtPayload) => {
   return result
 }
 
+const getUserPastBookingFromDB = async (
+  user: JwtPayload,
+  query: Record<string, unknown>,
+) => {
+  const userData = await User.findOne({ email: user?.email, role: user?.role })
+
+  // Ensure user data exists
+  if (!userData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  // Get the start of today in UTC
+  const todayStart = new Date()
+  todayStart.setUTCHours(0, 0, 0, 0)
+
+  // Base aggregation pipeline
+  const pipeline: PipelineStage[] = [
+    { $match: { customer: userData._id, payment: 'Paid' } },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slot',
+        foreignField: '_id',
+        as: 'slot',
+      },
+    },
+    { $unwind: '$slot' },
+    { $match: { 'slot.date': { $lt: todayStart } } },
+    {
+      $lookup: {
+        from: 'services',
+        localField: 'service',
+        foreignField: '_id',
+        as: 'service',
+      },
+    },
+    { $unwind: '$service' },
+  ]
+
+  // Pagination setup
+  const page = parseInt(query.page as string, 10) || 1 // Default to page 1
+  const limit = parseInt(query.limit as string, 10) || 10 // Default to 10 items per page
+  const skip = (page - 1) * limit
+
+  // Apply sorting
+  if (query.sort && typeof query.sort === 'string') {
+    try {
+      const sort = JSON.parse(query.sort) as Record<string, 1 | -1>
+      pipeline.push({ $sort: sort })
+    } catch (error) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid sort parameter')
+    }
+  }
+
+  // Apply field projection
+  if (query.fields && typeof query.fields === 'string') {
+    try {
+      const fields = JSON.parse(query.fields) as Record<string, 1>
+      pipeline.push({ $project: fields })
+    } catch (error) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid fields parameter')
+    }
+  }
+
+  // Count total records for pagination
+  const totalDocuments = await Booking.aggregate([
+    { $match: { customer: userData._id, payment: 'Paid' } },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slot',
+        foreignField: '_id',
+        as: 'slot',
+      },
+    },
+    { $unwind: '$slot' },
+    { $match: { 'slot.date': { $lt: todayStart } } },
+  ]).count('count')
+
+  // Calculate total pages
+  const totalPage = Math.ceil((totalDocuments[0]?.count || 0) / limit)
+
+  // Add pagination stages to the pipeline
+  pipeline.push({ $skip: skip }, { $limit: limit })
+
+  // Run the pipeline to get the paginated results
+  const result = await Booking.aggregate(pipeline)
+
+  return {
+    meta: {
+      page,
+      limit,
+      total: totalDocuments[0]?.count || 0,
+      totalPage,
+    },
+    result,
+  }
+}
+
 const deleteBookingFromDB = async (id: string) => {
   const booking = await Booking.findById(id)
 
@@ -147,5 +247,6 @@ export const BookingServices = {
   getAllBookingsFromDB,
   getUserBookingFromDB,
   getUserPendingBookingFromDB,
+  getUserPastBookingFromDB,
   deleteBookingFromDB,
 }
