@@ -33,5 +33,11 @@ router2.get(
   BookingControllers.getUserPastBooking,
 )
 
+router2.delete(
+  '/:id',
+  auth(USER_ROLE.user),
+  BookingControllers.deleteUserBooking,
+)
+
 export const BookingRoutes = router
 export const BookingRoutes2 = router2

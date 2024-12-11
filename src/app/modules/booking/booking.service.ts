@@ -242,6 +242,17 @@ const deleteBookingFromDB = async (id: string) => {
   return result
 }
 
+const deleteUserBookingFromDB = async (id: string) => {
+  const booking = await Booking.findById(id)
+
+  if (!booking) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Booking Not Found by this ID')
+  }
+
+  const result = await Booking.findByIdAndDelete(id)
+  return result
+}
+
 export const BookingServices = {
   createBookingInDB,
   getAllBookingsFromDB,
@@ -249,4 +260,5 @@ export const BookingServices = {
   getUserPendingBookingFromDB,
   getUserPastBookingFromDB,
   deleteBookingFromDB,
+  deleteUserBookingFromDB,
 }
