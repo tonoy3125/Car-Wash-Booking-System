@@ -33,6 +33,12 @@ router2.get(
   BookingControllers.getUserPastBooking,
 )
 
+router2.get(
+  '/my-upcoming-bookings',
+  auth(USER_ROLE.user),
+  BookingControllers.getUserUpcomingBooking,
+)
+
 router2.delete(
   '/:id',
   auth(USER_ROLE.user),

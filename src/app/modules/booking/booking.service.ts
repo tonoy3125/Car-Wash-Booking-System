@@ -231,6 +231,40 @@ const getUserPastBookingFromDB = async (
   }
 }
 
+const getUserUpcomingBookingFromDB = async (user: JwtPayload) => {
+  const userData = await User.findOne({ email: user?.email, role: user?.role })
+
+  // Ensure user exists
+  if (!userData) {
+    throw new Error('User not found')
+  }
+
+  // Get current date and time
+  const now = new Date()
+
+  const result = await Booking.find({
+    customer: userData._id,
+  })
+    .populate({
+      path: 'slot',
+      match: {
+        $or: [
+          { date: { $gt: now } }, // Slots with a future date
+          {
+            date: now.toISOString().split('T')[0], // Slots on the same day
+            startTime: { $gt: now.getHours() + now.getMinutes() / 60 }, // Compare startTime with current time
+          },
+        ],
+      },
+    })
+    .populate('service')
+
+  // Filter out bookings with no matching slots
+  const upcomingBookings = result.filter((booking) => booking.slot)
+
+  return upcomingBookings
+}
+
 const deleteBookingFromDB = async (id: string) => {
   const booking = await Booking.findById(id)
 
@@ -259,6 +293,7 @@ export const BookingServices = {
   getUserBookingFromDB,
   getUserPendingBookingFromDB,
   getUserPastBookingFromDB,
+  getUserUpcomingBookingFromDB,
   deleteBookingFromDB,
   deleteUserBookingFromDB,
 }
