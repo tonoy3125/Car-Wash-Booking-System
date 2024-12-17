@@ -65,8 +65,9 @@ class QueryBuilder<T> {
     // Handle time range filtering
     if (this.query.startTime || this.query.endTime) {
       const timeRange: Record<string, string> = {}
-      if (this.query.startTime) timeRange['$gte'] = this.query.startTime
-      if (this.query.endTime) timeRange['$lte'] = this.query.endTime
+      if (this.query.startTime)
+        timeRange['$gte'] = this.query.startTime as string
+      if (this.query.endTime) timeRange['$lte'] = this.query.endTime as string
 
       queryObj.startTime = timeRange // Ensure `startTime` is part of your model fields
     }

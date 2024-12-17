@@ -63,7 +63,7 @@ const getUserPastBooking = catchAsync(async (req, res) => {
 
 const getUserUpcomingBooking = catchAsync(async (req, res) => {
   const user = req?.user
-  const result = await BookingServices.getUserPendingBookingFromDB(user)
+  const result = await BookingServices.getUserUpcomingBookingFromDB(user)
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

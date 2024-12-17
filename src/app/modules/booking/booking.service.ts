@@ -241,26 +241,115 @@ const getUserUpcomingBookingFromDB = async (user: JwtPayload) => {
 
   // Get current date and time
   const now = new Date()
+  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() // Current time in minutes
+  const todayDate = new Date(now.toISOString().split('T')[0]) // Midnight of today's date
 
-  const result = await Booking.find({
-    customer: userData._id,
-  })
-    .populate({
-      path: 'slot',
-      match: {
+  // Aggregation pipeline
+  const upcomingBookings = await Booking.aggregate([
+    // Match bookings for the user and payment status 'Paid'
+    {
+      $match: {
+        customer: userData._id,
+        payment: 'Paid',
+      },
+    },
+    // Lookup the customer details (populate customer)
+    {
+      $lookup: {
+        from: 'users', // The name of the users collection
+        localField: 'customer', // The field in Booking collection
+        foreignField: '_id', // The field in User collection
+        as: 'customerDetails',
+      },
+    },
+    // Unwind the customerDetails array
+    {
+      $unwind: {
+        path: '$customerDetails',
+        preserveNullAndEmptyArrays: false, // Exclude documents with no customerDetails
+      },
+    },
+    // Lookup the slot details (populate slot)
+    {
+      $lookup: {
+        from: 'slots', // The name of the slots collection
+        localField: 'slot', // The field in Booking collection
+        foreignField: '_id', // The field in Slot collection
+        as: 'slotDetails',
+      },
+    },
+    // Unwind the slotDetails array
+    {
+      $unwind: {
+        path: '$slotDetails',
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+    // Add fields to convert slot date and time
+    {
+      $addFields: {
+        slotDetailsDate: {
+          $toDate: '$slotDetails.date', // Convert slotDetails.date to Date object
+        },
+        slotDetailsEndTime: {
+          $let: {
+            vars: {
+              dateStr: {
+                $concat: [
+                  { $substr: [{ $toString: todayDate }, 0, 10] }, // Today's date in YYYY-MM-DD format
+                  ' ', // Space between date and time
+                  '$slotDetails.endTime', // Add the time from the slot
+                ],
+              },
+            },
+            in: { $toDate: '$$dateStr' }, // Convert to Date object
+          },
+        },
+      },
+    },
+    // Match slots based on date and time
+    {
+      $match: {
         $or: [
-          { date: { $gt: now } }, // Slots with a future date
+          // Future dates
+          { slotDetailsDate: { $gt: todayDate } },
+          // Today's date and future time
           {
-            date: now.toISOString().split('T')[0], // Slots on the same day
-            startTime: { $gt: now.getHours() + now.getMinutes() / 60 }, // Compare startTime with current time
+            $and: [
+              { slotDetailsDate: todayDate }, // Slots on the same day
+              {
+                $expr: {
+                  $gt: [
+                    { $minute: '$slotDetailsEndTime' }, // Compare minutes of endTime
+                    currentTimeInMinutes, // Current time in minutes
+                  ],
+                },
+              },
+            ],
           },
         ],
       },
-    })
-    .populate('service')
-
-  // Filter out bookings with no matching slots
-  const upcomingBookings = result.filter((booking) => booking.slot)
+    },
+    // Lookup the service details
+    {
+      $lookup: {
+        from: 'services', // The name of the service collection
+        localField: 'service',
+        foreignField: '_id',
+        as: 'serviceDetails',
+      },
+    },
+    // Format the output (optional)
+    {
+      $project: {
+        _id: 1,
+        customer: '$customerDetails', // Populate customer
+        payment: 1,
+        slot: '$slotDetails', // Populate slot
+        service: { $arrayElemAt: ['$serviceDetails', 0] }, // Flatten the serviceDetails array
+      },
+    },
+  ])
 
   return upcomingBookings
 }

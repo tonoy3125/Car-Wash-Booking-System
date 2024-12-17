@@ -27,30 +27,24 @@ const createSlotIntoDB = async (payload: TSlot) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid service duration unit')
   }
 
-  // Helper function to convert 12-hour time format with AM/PM to minutes from midnight
+  // Helper function to convert 24-hour time format (HH:mm) to minutes from midnight
   const convertTimeToMinutes = (time: string): number => {
-    const [hourMinute, period] = time.split(' ') // Split time and AM/PM
-    const [hours, minutes] = hourMinute.split(':').map(Number)
-    const isPM = period.toUpperCase() === 'PM'
-    const hourIn24 = (hours % 12) + (isPM ? 12 : 0) // Convert to 24-hour format
-    return hourIn24 * 60 + minutes
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 60 + minutes
   }
 
-  // Helper function to convert minutes from midnight to 12-hour time format with AM/PM
+  // Helper function to convert minutes from midnight to 24-hour time format (HH:mm)
   const convertMinutesToTime = (minutes: number): string => {
     const hours24 = Math.floor(minutes / 60)
     const minutesLeft = minutes % 60
-    const isPM = hours24 >= 12
-    const hours12 = hours24 % 12 || 12 // Convert 0 to 12 for 12-hour format
-    const period = isPM ? 'PM' : 'AM'
-    return `${hours12.toString().padStart(2, '0')}:${minutesLeft
+    return `${hours24.toString().padStart(2, '0')}:${minutesLeft
       .toString()
-      .padStart(2, '0')} ${period}`
+      .padStart(2, '0')}`
   }
 
   // Extract start time and end time from payload
-  const startTimeString = payload?.startTime // e.g., "09:00 AM"
-  const endTimeString = payload?.endTime // e.g., "02:00 PM"
+  const startTimeString = payload?.startTime // e.g., "09:00"
+  const endTimeString = payload?.endTime // e.g., "18:00"
 
   // Convert times to total minutes from midnight
   const startTimeInMins = convertTimeToMinutes(startTimeString)
@@ -87,8 +81,8 @@ const createSlotIntoDB = async (payload: TSlot) => {
   const slots = timeIntervals.map((time) => ({
     service: payload?.service,
     date: payload?.date, // Assuming the date is provided in the payload
-    startTime: time.startTime,
-    endTime: time.endTime,
+    startTime: time.startTime, // In 24-hour format
+    endTime: time.endTime, // In 24-hour format
   }))
 
   // Save slots to the database
