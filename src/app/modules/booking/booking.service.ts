@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JwtPayload } from 'jsonwebtoken'
 import { TBookingForReq } from './booking.interface'
 import { User } from '../user/user.model'
@@ -144,8 +145,22 @@ const getUserPastBookingFromDB = async (
   }
 
   // Get the start of today in UTC
-  const todayStart = new Date()
-  todayStart.setUTCHours(0, 0, 0, 0)
+  const now = new Date()
+  const timezoneOffset = 6 * 60 // Asia/Dhaka is UTC +6
+
+  // Adjust the current time to Asia/Dhaka
+  const nowLocalTime = new Date(now.getTime() + timezoneOffset * 60 * 1000)
+
+  // Combine slot.date and slot.startTime into a Date object to get the full datetime
+  const convertSlotToDate = (slotDate: Date, startTime: string): Date => {
+    const slotTimeParts = startTime.split(':')
+    const slotHours = parseInt(slotTimeParts[0], 10)
+    const slotMinutes = parseInt(slotTimeParts[1], 10)
+
+    const newSlotDate = new Date(slotDate)
+    newSlotDate.setHours(slotHours, slotMinutes, 0, 0) // Set time from startTime
+    return newSlotDate
+  }
 
   // Base aggregation pipeline
   const pipeline: PipelineStage[] = [
@@ -159,7 +174,29 @@ const getUserPastBookingFromDB = async (
       },
     },
     { $unwind: '$slot' },
-    { $match: { 'slot.date': { $lt: todayStart } } },
+    {
+      $addFields: {
+        slotDateTime: {
+          $let: {
+            vars: {
+              slotDate: '$slot.date',
+              startTime: '$slot.startTime',
+            },
+            in: {
+              $toDate: {
+                $concat: [
+                  { $dateToString: { format: '%Y-%m-%d', date: '$$slotDate' } },
+                  ' ',
+                  '$$startTime',
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+    // Match past bookings where the combined date and time is in the past
+    { $match: { slotDateTime: { $lt: nowLocalTime } } },
     {
       $lookup: {
         from: 'services',
@@ -208,7 +245,28 @@ const getUserPastBookingFromDB = async (
       },
     },
     { $unwind: '$slot' },
-    { $match: { 'slot.date': { $lt: todayStart } } },
+    {
+      $addFields: {
+        slotDateTime: {
+          $let: {
+            vars: {
+              slotDate: '$slot.date',
+              startTime: '$slot.startTime',
+            },
+            in: {
+              $toDate: {
+                $concat: [
+                  { $dateToString: { format: '%Y-%m-%d', date: '$$slotDate' } },
+                  ' ',
+                  '$$startTime',
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+    { $match: { slotDateTime: { $lt: nowLocalTime } } },
   ]).count('count')
 
   // Calculate total pages
@@ -239,10 +297,15 @@ const getUserUpcomingBookingFromDB = async (user: JwtPayload) => {
     throw new Error('User not found')
   }
 
-  // Get current date and time
+  // Get the current date and time in Bangladesh time (Asia/Dhaka timezone)
+  // Get the current UTC time
   const now = new Date()
-  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() // Current time in minutes
-  const todayDate = new Date(now.toISOString().split('T')[0]) // Midnight of today's date
+  const timezoneOffset = 6 * 60 // Asia/Dhaka is UTC +6
+
+  // Adjust the current time to Asia/Dhaka
+  const nowLocalTime = new Date(now.getTime() + timezoneOffset * 60 * 1000)
+
+  // console.log(nowLocalTime)
 
   // Aggregation pipeline
   const upcomingBookings = await Booking.aggregate([
@@ -285,49 +348,54 @@ const getUserUpcomingBookingFromDB = async (user: JwtPayload) => {
         preserveNullAndEmptyArrays: false,
       },
     },
-    // Add fields to convert slot date and time
+    // Add fields to convert slot date and time to local time
     {
       $addFields: {
-        slotDetailsDate: {
-          $toDate: '$slotDetails.date', // Convert slotDetails.date to Date object
-        },
-        slotDetailsEndTime: {
+        slotDetailsStartTime: {
           $let: {
             vars: {
-              dateStr: {
+              startTimeStr: {
                 $concat: [
-                  { $substr: [{ $toString: todayDate }, 0, 10] }, // Today's date in YYYY-MM-DD format
-                  ' ', // Space between date and time
-                  '$slotDetails.endTime', // Add the time from the slot
+                  { $substr: [{ $toString: '$slotDetails.date' }, 0, 10] }, // Date from slot
+                  ' ',
+                  '$slotDetails.startTime', // Add the start time
                 ],
               },
             },
-            in: { $toDate: '$$dateStr' }, // Convert to Date object
+            in: { $toDate: '$$startTimeStr' }, // Convert to Date object
+          },
+        },
+        slotDetailsStartTimeLocal: {
+          $let: {
+            vars: {
+              startTimeStr: {
+                $concat: [
+                  { $substr: [{ $toString: '$slotDetails.date' }, 0, 10] },
+                  ' ',
+                  '$slotDetails.startTime',
+                ],
+              },
+            },
+            in: {
+              $toDate: {
+                $dateToString: {
+                  format: '%Y-%m-%dT%H:%M:%S',
+                  date: { $toDate: '$$startTimeStr' },
+                },
+              },
+            },
           },
         },
       },
     },
-    // Match slots based on date and time
+    // Match slots that are still upcoming (current time is before slot start time)
     {
       $match: {
-        $or: [
-          // Future dates
-          { slotDetailsDate: { $gt: todayDate } },
-          // Today's date and future time
-          {
-            $and: [
-              { slotDetailsDate: todayDate }, // Slots on the same day
-              {
-                $expr: {
-                  $gt: [
-                    { $minute: '$slotDetailsEndTime' }, // Compare minutes of endTime
-                    currentTimeInMinutes, // Current time in minutes
-                  ],
-                },
-              },
-            ],
-          },
-        ],
+        $expr: {
+          $and: [
+            { $gte: ['$slotDetailsStartTimeLocal', nowLocalTime] }, // Compare to local time
+          ],
+        },
       },
     },
     // Lookup the service details
