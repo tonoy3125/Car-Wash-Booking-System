@@ -9,6 +9,7 @@ export type TUser = {
   password: string
   phone: number
   role: TUserRoles
+  image?: string
   address: string
 }
 
@@ -19,5 +20,3 @@ export interface UserModel extends Model<TUser> {
     hashedPassword: string,
   ): Promise<boolean>
 }
-
-

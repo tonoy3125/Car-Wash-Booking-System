@@ -41,6 +41,7 @@ const updateUserRole = catchAsync(async (req, res) => {
 })
 
 const updateUser = catchAsync(async (req, res) => {
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] }
   const { id } = req.params
   const payload = req.body // All updated fields should be passed in the request body
 
@@ -51,7 +52,7 @@ const updateUser = catchAsync(async (req, res) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID')
   }
 
-  const result = await UserServices.updateUserIntoDB(id, payload)
+  const result = await UserServices.updateUserIntoDB(id, files, payload)
 
   // Determine the success message based on the user's role
   const message =

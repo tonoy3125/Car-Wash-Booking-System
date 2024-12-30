@@ -23,6 +23,9 @@ const userSchema = new Schema<TUser>(
       type: Number,
       required: true,
     },
+    image: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ['user', 'admin'],

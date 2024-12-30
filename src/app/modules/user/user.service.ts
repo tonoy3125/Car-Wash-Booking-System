@@ -50,7 +50,11 @@ const updateUserRoleInDB = async (id: string, newRole: string) => {
   return updatedUser
 }
 
-const updateUserIntoDB = async (id: string, payload: TUser) => {
+const updateUserIntoDB = async (
+  id: string,
+  files: { [fieldname: string]: Express.Multer.File[] },
+  payload: Partial<TUser>,
+) => {
   // Check if the payload includes the role field
   if ('role' in payload) {
     throw new AppError(
@@ -64,6 +68,10 @@ const updateUserIntoDB = async (id: string, payload: TUser) => {
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID')
+  }
+
+  if (files.image && files.image[0]) {
+    payload.image = files.image[0].path // Assign the image URL
   }
 
   // Update the user's details
