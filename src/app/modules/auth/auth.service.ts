@@ -4,7 +4,7 @@ import { TUser } from '../user/user.interface'
 import { User } from '../user/user.model'
 import { TLoginUser } from './auth.interface'
 import config from '../../config'
-import createToken from './auth.utils'
+import createToken, { verifyToken } from './auth.utils'
 import { sendEmail } from '../../utils/sendEmail'
 
 const signUp = async (payload: TUser) => {
@@ -60,6 +60,35 @@ const login = async (payload: TLoginUser) => {
   }
 }
 
+const refreshToken = async (token: string) => {
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string)
+  // console.log(decoded)
+  const { email } = decoded
+  // check if the user is exits
+  const user = await User.isUserExistsByEmail(email)
+  // console.log(user)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User does not exists')
+  }
+
+  const jwtPayload = {
+    email: user?.email,
+    role: user?.role,
+    name: user.name,
+    phone: user?.phone,
+  }
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  )
+  return {
+    accessToken,
+  }
+}
+
 const forgetPassword = async (email: string) => {
   // check if the user is exits
   const user = await User.isUserExistsByEmail(email)
@@ -95,5 +124,6 @@ const forgetPassword = async (email: string) => {
 export const AuthServices = {
   signUp,
   login,
+  refreshToken,
   forgetPassword,
 }
