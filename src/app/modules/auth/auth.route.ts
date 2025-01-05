@@ -18,4 +18,10 @@ router.post(
   AuthControllers.login,
 )
 
+router.post(
+  '/forget-password',
+  validateRequest(AuthValidations.forgetPasswordValidationSchema),
+  AuthControllers.forgetPassword,
+)
+
 export const AuthRoutes = router
