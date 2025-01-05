@@ -27,8 +27,8 @@ const getAvailableSlots = catchAsync(async (req, res) => {
 })
 
 const getSlotsByService = catchAsync(async (req, res) => {
-  const { serviceId } = req.params // Extract service ID from route params
-  const query = req.query // Extract query parameters (e.g., startTime, endTime)
+  const { serviceId } = req.params
+  const query = req.query
 
   const result = await SlotServices.getSlotsByServiceFromDB(serviceId, query)
 
@@ -41,8 +41,8 @@ const getSlotsByService = catchAsync(async (req, res) => {
 })
 
 const updateSlotStatus = catchAsync(async (req, res) => {
-  const { id } = req.params // Slot ID
-  const { isBooked } = req.body // New status (available or canceled)
+  const { id } = req.params
+  const { isBooked } = req.body
 
   const result = await SlotServices.updateSlotStatusInDB(id, isBooked)
 

@@ -33,7 +33,21 @@ const login = catchAsync(async (req, res) => {
   })
 })
 
+const forgetPassword = catchAsync(async (req, res) => {
+  const email = req.body.email
+
+  const result = await AuthServices.forgetPassword(email)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `We've sent you an email with a link to update your password.`,
+    data: result,
+  })
+})
+
 export const AuthControllers = {
   signUp,
   login,
+  forgetPassword,
 }

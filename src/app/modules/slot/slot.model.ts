@@ -24,9 +24,9 @@ const slotSchema = new Schema<TSlot>(
       validate: {
         validator: function (v: string) {
           if (time12HourRegex.test(v)) {
-            return false // Reject 12-hour format
+            return false 
           }
-          return time24HourRegex.test(v) // Accept only 24-hour format
+          return time24HourRegex.test(v) 
         },
         message: (props) =>
           `${props.value} is not a valid time format! Use HH:mm (24-hour format). Avoid AM/PM.`,
@@ -38,9 +38,9 @@ const slotSchema = new Schema<TSlot>(
       validate: {
         validator: function (v: string) {
           if (time12HourRegex.test(v)) {
-            return false // Reject 12-hour format
+            return false 
           }
-          return time24HourRegex.test(v) // Accept only 24-hour format
+          return time24HourRegex.test(v) 
         },
         message: (props) =>
           `${props.value} is not a valid time format! Use HH:mm (24-hour format). Avoid AM/PM.`,

@@ -148,7 +148,7 @@ const getSlotsByServiceFromDB = async (
 }
 
 const updateSlotStatusInDB = async (id: string, newIsBooked: TIsBooked) => {
-  const validStatus = ['available', 'canceled'] // Admin can only toggle these states
+  const validStatus = ['available', 'canceled'] 
 
   if (!validStatus.includes(newIsBooked)) {
     throw new AppError(

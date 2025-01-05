@@ -16,9 +16,9 @@ router.post(
 
 router.patch(
   '/isBooked/:id',
-  auth(USER_ROLE.admin), // Ensure only admins can access this endpoint
-  validateRequest(SlotValidations.updateSlotStatusValidationSchema), // Apply validation schema
-  SlotControllers.updateSlotStatus, // Update status logic
+  auth(USER_ROLE.admin), 
+  validateRequest(SlotValidations.updateSlotStatusValidationSchema), 
+  SlotControllers.updateSlotStatus, 
 )
 
 router.delete('/:id', auth(USER_ROLE.admin), SlotControllers.deleteSlot)
