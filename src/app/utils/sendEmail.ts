@@ -22,7 +22,7 @@ export const sendEmail = async (to: string, resetLink: string) => {
         <title>Reset Your Password</title>
         <style>
           body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             background-color: #f9f9f9;
             margin: 0;
             padding: 0;
@@ -65,7 +65,12 @@ export const sendEmail = async (to: string, resetLink: string) => {
             color: #ffffff;
             text-decoration: none;
             font-size: 16px;
+            font-weight: 600;
             border-radius: 5px;
+            transition: background-color 0.3s ease;
+          }
+          .button:hover {
+            background-color: #157a9e;
           }
           .footer {
             background-color: #f4f4f4;
@@ -82,7 +87,7 @@ export const sendEmail = async (to: string, resetLink: string) => {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Car Wash Service</h1>
+            <h1>Aqua Auto </h1>
             <p>Making Your Car Shine, Every Time!</p>
           </div>
           <div class="body">
@@ -92,7 +97,7 @@ export const sendEmail = async (to: string, resetLink: string) => {
             <p>If you didn’t request this, please ignore this email or contact support.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2024 Car Wash Service. All rights reserved.</p>
+            <p>&copy; 2025 Car Wash Service. All rights reserved.</p>
           </div>
         </div>
       </body>
