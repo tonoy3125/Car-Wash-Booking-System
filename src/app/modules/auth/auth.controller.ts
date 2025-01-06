@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync'
 import sendResponse from '../../utils/sendResponse'
 import { AuthServices } from './auth.service'
 import config from '../../config'
+import { TResetPasswordResult } from './auth.interface'
 
 const signUp = catchAsync(async (req, res) => {
   const result = await AuthServices.signUp(req.body)
@@ -61,9 +62,35 @@ const forgetPassword = catchAsync(async (req, res) => {
   })
 })
 
+const resetPassword = catchAsync(async (req, res) => {
+  const token = req.headers.authorization
+
+  // Reset password and generate new tokens
+  const { accessToken, refreshToken, user } = (await AuthServices.resetPassword(
+    req.body,
+    token!,
+  )) as TResetPasswordResult
+
+  // console.log(accessToken, refreshToken, user)
+
+  // Set the new refreshToken as a secure, HTTP-only cookie
+  res.cookie('refreshToken', refreshToken, {
+    secure: config.NODE_ENV === 'development',
+    httpOnly: true,
+  })
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password Reset Successfully',
+    data: { accessToken, user },
+  })
+})
+
 export const AuthControllers = {
   signUp,
   login,
   refreshToken,
   forgetPassword,
+  resetPassword,
 }
