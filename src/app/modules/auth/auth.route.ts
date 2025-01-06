@@ -19,6 +19,12 @@ router.post(
 )
 
 router.post(
+  '/refresh-token',
+  validateRequest(AuthValidations.refreshTokenValidationSchema),
+  AuthControllers.refreshToken,
+)
+
+router.post(
   '/forget-password',
   validateRequest(AuthValidations.forgetPasswordValidationSchema),
   AuthControllers.forgetPassword,
