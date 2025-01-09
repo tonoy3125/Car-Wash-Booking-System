@@ -27,9 +27,9 @@ export const initiatePayment = async (payload: IPaymentPayload) => {
     currency: 'BDT',
     amount,
     tran_id,
-    success_url: `http://localhost:5000/api/payment/success?pt=${PT}`,
-    fail_url: `http://localhost:5000/api/payment/fail?pt=${PT}`,
-    cancel_url: `http://localhost:5000/api/payment/fail?pt=${PT}`,
+    success_url: `https://car-wash-booking-system-six.vercel.app/api/payment/success?pt=${PT}`,
+    fail_url: `https://car-wash-booking-system-six.vercel.app/api/payment/fail?pt=${PT}`,
+    cancel_url: `https://car-wash-booking-system-six.vercel.app/api/payment/fail?pt=${PT}`,
     desc: 'Course Fee',
     type: 'json',
   })
