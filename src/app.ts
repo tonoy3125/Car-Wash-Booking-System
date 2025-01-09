@@ -16,8 +16,8 @@ app.use(cookieParser())
 app.use(
   cors({
     origin: [
-      'http://localhost:5173',
-      // 'https://power-pulse-fitness-equipment-and-accessories-frontend.vercel.app',
+      // 'http://localhost:5173',
+      'https://aqua-auto-car-wash-booking-system-frontend.vercel.app',
     ],
     credentials: true,
   }),
@@ -27,7 +27,7 @@ app.use(
 app.use('/api', routes)
 
 app.get('/', (req, res) => {
-  res.json({
+  res.send({
     message: 'Wellcome to Car Wash Backend',
   })
 })

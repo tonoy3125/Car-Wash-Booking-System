@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import cron from 'node-cron'
 import { Slot } from '../modules/slot/slot.model'
 
