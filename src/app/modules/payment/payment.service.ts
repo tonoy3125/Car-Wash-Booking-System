@@ -56,7 +56,7 @@ const successPayment = async (paymentInfoToken: string) => {
   // Correctly process the email template
   const filePath = join(__dirname, '../../templates/success.html')
   const template = readFileSync(filePath, 'utf-8')
-  const successTemplate = template.replace('{{link}}', 'http://localhost:5173/')
+  const successTemplate = template.replace('{{link}}', 'https://aqua-auto-car-wash-booking-system-frontend.vercel.app/')
 
   // Return the updated information along with the processed email template
   return {
@@ -80,7 +80,7 @@ const errorPayment = async (paymentInfoToken: string) => {
   const template = readFileSync(filePath, 'utf-8')
   const errorTemplate = template.replace(
     '{{link}}',
-    'http://localhost:5173/booking',
+    'https://aqua-auto-car-wash-booking-system-frontend.vercel.app/booking',
   )
 
   // Return the updated information along with the processed email template
