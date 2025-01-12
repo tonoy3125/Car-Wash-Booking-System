@@ -55,8 +55,12 @@ const successPayment = async (paymentInfoToken: string) => {
 
   // Correctly process the email template
   const filePath = join(__dirname, '../../templates/success.html')
+  console.log(filePath)
   const template = readFileSync(filePath, 'utf-8')
-  const successTemplate = template.replace('{{link}}', 'https://aqua-auto-car-wash-booking-system-frontend.vercel.app/')
+  const successTemplate = template.replace(
+    '{{link}}',
+    'https://aqua-auto-car-wash-booking-system-frontend.vercel.app/',
+  )
 
   // Return the updated information along with the processed email template
   return {
