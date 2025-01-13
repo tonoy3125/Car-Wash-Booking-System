@@ -16,8 +16,8 @@ app.use(cookieParser())
 app.use(
   cors({
     origin: [
-      // 'http://localhost:5173',
-      'https://aqua-auto-car-wash-booking-system-frontend.vercel.app',
+      'http://localhost:5173',
+      // 'https://aqua-auto-car-wash-booking-system-frontend.vercel.app',
       // 'https://car-wash-booking-system-six.vercel.app',
     ],
     credentials: true,
