@@ -1,13 +1,17 @@
-import express from 'express'
-import { AuthRoutes } from '../modules/auth/auth.route'
-import { ServiceRoutes } from '../modules/service/service.route'
-import { SlotRoutes, SlotRoutes2 } from '../modules/slot/slot.route'
-import { BookingRoutes, BookingRoutes2 } from '../modules/booking/booking.route'
-import { UserRoutes } from '../modules/user/user.route'
-import { PaymentRoutes } from '../modules/payment/payment.route'
-import { ReviewRoutes } from '../modules/review/review.route'
+import express from 'express';
+import { AuthRoutes } from '../modules/auth/auth.route';
+import { ServiceRoutes } from '../modules/service/service.route';
+import { SlotRoutes, SlotRoutes2 } from '../modules/slot/slot.route';
+import {
+  BookingRoutes,
+  BookingRoutes2,
+} from '../modules/booking/booking.route';
+import { UserRoutes } from '../modules/user/user.route';
+import { PaymentRoutes } from '../modules/payment/payment.route';
+import { ReviewRoutes } from '../modules/review/review.route';
+import { StatisticsRoutes } from '../modules/statistics/statistics.route';
 
-const router = express.Router()
+const router = express.Router();
 
 const routerModules = [
   {
@@ -46,8 +50,12 @@ const routerModules = [
     path: '/review',
     route: ReviewRoutes,
   },
-]
+  {
+    path: '/statistics',
+    route: StatisticsRoutes,
+  },
+];
 
 export const routes = routerModules.map((item) =>
   router.use(item?.path, item?.route),
-)
+);

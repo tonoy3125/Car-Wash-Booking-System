@@ -1,10 +1,10 @@
-import axios from 'axios'
-import jwt from 'jsonwebtoken'
-import { IPaymentPayload } from './payment.interface'
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import { IPaymentPayload } from './payment.interface';
 
 export const initiatePayment = async (payload: IPaymentPayload) => {
   const { amount, cus_add, cus_name, cus_phone, cus_email, tran_id, customer } =
-    payload
+    payload;
 
   // console.log('Customer Info:', { customer, userId })
 
@@ -12,8 +12,8 @@ export const initiatePayment = async (payload: IPaymentPayload) => {
     { transactionId: tran_id, amount, customer },
     process.env.SIGNATURE_KEY as string,
     { expiresIn: '10d' },
-  )
-  console.log('Generated payment token:', PT)
+  );
+  console.log('Generated payment token:', PT);
   const response = await axios.post(`${process.env.PAYMENT_URL}`, {
     store_id: process.env.STORE_ID,
     signature_key: process.env.SIGNATURE_KEY,
@@ -27,13 +27,13 @@ export const initiatePayment = async (payload: IPaymentPayload) => {
     currency: 'BDT',
     amount,
     tran_id,
-    success_url: `http://localhost:5000/api/payment/success?pt=${PT}`,
-    fail_url: `http://localhost:5000/api/payment/fail?pt=${PT}`,
-    cancel_url: `http://localhost:5000/api/payment/fail?pt=${PT}`,
+    success_url: `https://car-wash-booking-system-six.vercel.app/api/payment/success?pt=${PT}`,
+    fail_url: `https://car-wash-booking-system-six.vercel.app/api/payment/fail?pt=${PT}`,
+    cancel_url: `https://car-wash-booking-system-six.vercel.app/api/payment/fail?pt=${PT}`,
     desc: 'Course Fee',
     type: 'json',
-  })
+  });
   // console.log('Payment gateway response:', response.data)
 
-  return response.data
-}
+  return response.data;
+};
